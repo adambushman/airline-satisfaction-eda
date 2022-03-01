@@ -7,6 +7,8 @@ aDataRaw = pd.read_csv('airlineSatisfaction.csv')
 
 print(aDataRaw.info())
 
+# Let's make some data viz
+
 
 # Stuff to get the zeros for each category column
 
