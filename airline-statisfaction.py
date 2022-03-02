@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import numpy as np
 
 # Load the data (change to your personal directory)
 os.chdir('C:/Users/Adam Bushman/Downloads')
@@ -54,3 +55,31 @@ aDataWithDummies = pd.concat(dummies, axis = 1)
 renameDict = {'disloyal Customer': 'Disloyal Customer', 'Business': 'Business Class', 'Eco': 'Economy Class', 'Eco Plus': 'Economy Plus', 'neutral or dissatisfied': 'Not Satisfied', 'satisfied': 'Satisfied'}
 aDataWithDummies.rename(columns=renameDict)
 
+# Remove rows with 0 entry for satisfaction rating features
+cats.remove('Departure/Arrival time convenient')
+
+aDataZeros = aDataWithDummies
+aDataZeros['Zeros Present'] = False
+'''
+for ind, row in aDataZeros.iterrows():
+    listTest = np.array(aDataWithDummies.loc[i, cats])
+    y = np.where(listTest == 0)
+    if y[0].size > 0:
+        aDataZeros.loc[j, ('Zeros Present')] = True
+'''
+for ind, row in aDataZeros.iterrows():
+    listTest = np.array(row[cats])
+    y = np.where(listTest == 0)
+    if y[0].size > 0:
+        aDataZeros.loc[ind, 'Zeros Present'] = True
+
+# We lose ~4700 rows by removing zeros from the satisfaction ratings
+check = aDataZeros[aDataZeros['Zeros Present'] == True]
+print('We lose', len(check), 'rows from our initial list of ', len(aDataWithDummies),', or appox', float(len(check)) / len(aDataWithDummies), 'percent')
+
+aDataClean = aDataZeros
+
+
+######################
+# Data Visualization #
+######################
