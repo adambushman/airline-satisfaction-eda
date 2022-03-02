@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sb
 
 # Load the data (change to your personal directory)
 os.chdir('C:/Users/Adam Bushman/Downloads')
@@ -53,20 +55,14 @@ aDataWithDummies = pd.concat(dummies, axis = 1)
 
 # Rename columns
 renameDict = {'disloyal Customer': 'Disloyal Customer', 'Business': 'Business Class', 'Eco': 'Economy Class', 'Eco Plus': 'Economy Plus', 'neutral or dissatisfied': 'Not Satisfied', 'satisfied': 'Satisfied'}
-aDataWithDummies.rename(columns=renameDict)
+aDataWithDummies.rename(columns=renameDict, inplace = True)
 
 # Remove rows with 0 entry for satisfaction rating features
 cats.remove('Departure/Arrival time convenient')
 
 aDataZeros = aDataWithDummies
 aDataZeros['Zeros Present'] = False
-'''
-for ind, row in aDataZeros.iterrows():
-    listTest = np.array(aDataWithDummies.loc[i, cats])
-    y = np.where(listTest == 0)
-    if y[0].size > 0:
-        aDataZeros.loc[j, ('Zeros Present')] = True
-'''
+
 for ind, row in aDataZeros.iterrows():
     listTest = np.array(row[cats])
     y = np.where(listTest == 0)
@@ -78,9 +74,23 @@ check = aDataZeros[aDataZeros['Zeros Present'] == True]
 print('We lose', len(check), 'rows from our initial list of ', len(aDataWithDummies),', or appox', float(len(check)) / len(aDataWithDummies), 'percent')
 
 aDataClean = aDataZeros[aDataZeros['Zeros Present'] == False]
-aDataClean.drop(columns = ['Zeros Present'])
+aDataClean.drop(columns = ['Zeros Present'], inplace = True)
 
 
 ######################
 # Data Visualization #
 ######################
+
+#Boxplot by age and ease of booking online
+sb.set_theme(style="whitegrid")
+sb.set(style='ticks')
+ax = sb.boxplot(x='Ease of Online booking', y='Age', data=aDataClean)
+plt.show()
+
+#Boxplot by customer type and for 4+ delays
+dataFiltered = aDataClean[aDataClean['Flight Distance'] >= 2000]
+ax = sb.boxplot(x='Satisfied', y='Flight Distance', data=dataFiltered)
+plt.show()
+
+#Scatter plots
+# ax = sb.scatterplot(data = dataFiltered, x='Flight Distance', y='Satisfied')
