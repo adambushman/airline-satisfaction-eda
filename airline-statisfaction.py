@@ -77,7 +77,8 @@ for ind, row in aDataZeros.iterrows():
 check = aDataZeros[aDataZeros['Zeros Present'] == True]
 print('We lose', len(check), 'rows from our initial list of ', len(aDataWithDummies),', or appox', float(len(check)) / len(aDataWithDummies), 'percent')
 
-aDataClean = aDataZeros
+aDataClean = aDataZeros[aDataZeros['Zeros Present'] == False]
+aDataClean.drop(columns = ['Zeros Present'])
 
 
 ######################
