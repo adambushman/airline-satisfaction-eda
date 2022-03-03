@@ -97,24 +97,47 @@ plt.show()
 
 #Boxplot by customer type and for 2,000+ mile long flights
 dataFiltered = aDataClean[aDataClean['Flight Distance'] >= 2000]
-ax = sb.boxplot(x='Satisfied', y='Flight Distance', data=dataFiltered)
+ax = sb.boxplot(x='satisfaction', y='Flight Distance', data=dataFiltered)
 plt.show()
 
 
 # ax = sb.histplot(data = aDataClean, x = 'Departure Delay in Minutes', bins = 10)
-# plt.show()
+#plt.show()
 
 
 ######################
 # Summary Statistics #
 ######################
 
-#Frequency table of delays (+30 mins)
-dataFiltered = aDataClean[aDataClean['Departure Delay in Minutes'] >= 30]
+#Delays (+30 mins)
+dataFiltered = aDataClean[(aDataClean['Departure Delay in Minutes']) >= 30 | (aDataClean['Arrival Delay in Minutes'] >= 30)]
+
+#By customer type
 pd.crosstab(dataFiltered['Customer Type'], dataFiltered['satisfaction'])
    # Fisher's test reports p-value < 0.00001
 
-dataFiltered = aDataClean[aDataClean['Arrival Delay in Minutes'] >= 30]
-pd.crosstab(dataFiltered['Customer Type'], dataFiltered['satisfaction'])
+#By travel type
+pd.crosstab(dataFiltered['Type of Travel'], dataFiltered['satisfaction'])
    # Fisher's test reports p-value < 0.00001
 
+#Long Flights (+2000 miles)
+dataFiltered = aDataClean[(aDataClean['Flight Distance']) >= 2000]
+
+#By seat class
+pd.crosstab(dataFiltered['Class'], dataFiltered['satisfaction'])
+   # Chi-squared test estimates p-value < 0.00001
+
+#Random summary statistics
+print('Median Departure Delay:', aDataClean['Departure Delay in Minutes'].median())
+print('Departure Delay StDev:', np.std(aDataClean['Departure Delay in Minutes']))
+
+print('Median Arrival Delay:', aDataClean['Arrival Delay in Minutes'].median())
+print('Arrival Delay StDev:', np.std(aDataClean['Arrival Delay in Minutes']))
+
+dataSub40 = aDataClean[aDataClean['Age'] < 40]
+dataPlus40 = aDataClean[aDataClean['Age'] >= 40]
+print('Average Satisfaction with Online Booking (age < 40):', dataSub40['Ease of Online booking'].mean())
+print('Satisfaction with Online Booking StDev (age < 40):', np.std(dataSub40['Ease of Online booking']))
+
+print('Average Satisfaction with Online Booking (age >= 40):', dataPlus40['Ease of Online booking'].mean())
+print('Satisfaction with Online Booking StDev (age >= 40):', np.std(dataPlus40['Ease of Online booking']))
