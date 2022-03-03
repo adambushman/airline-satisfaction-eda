@@ -100,9 +100,9 @@ dataFiltered = aDataClean[aDataClean['Flight Distance'] >= 2000]
 ax = sb.boxplot(x='satisfaction', y='Flight Distance', data=dataFiltered)
 plt.show()
 
-
-# ax = sb.histplot(data = aDataClean, x = 'Departure Delay in Minutes', bins = 10)
-#plt.show()
+aData2Hr = aDataClean[aDataClean['Departure Delay in Minutes'] < 120]
+ax = sb.histplot(data = aData2Hr, x = 'Departure Delay in Minutes', bins = 6)
+plt.show()
 
 
 ######################
