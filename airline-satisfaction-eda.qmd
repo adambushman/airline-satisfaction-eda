@@ -34,3 +34,187 @@ This dataset was chosen because it relates to how well a business is resonating 
 
 At first glance it is reasonably complete, sizeable in its number of rows, and poses a wealth of fields to explore. 
 
+# Wrangling the Dataset
+
+Before tackling our data analysis, we'll first get our arms around the dataset. We need to understand each field, how tidy and complete they are, and assess what any simple to advanced transformations are needed.
+
+## A Quick Glimpse
+
+```{python}
+
+print(aDataRaw.info())
+
+```
+
+The dataset has nearly 104,000 observations and about 23 variables interesting to our study. `Unnamed: 0` and `id` are unique identifiers that don't determine airline satisfaction.
+
+It appears that every feature is complete except for `Arrival Delay in Minutes` which has ~300 null values, which is pretty inconsiquential.
+
+## Understanding the Fields
+
+There are five "object" or "string" data type columns. Let's take a look at each of these and range of values we can expect:
+
+```{python}
+
+vars1 = ([
+    'Gender', 
+    'Customer Type', 
+    'Type of Travel', 
+    'Class', 'satisfaction'
+    ])
+
+for v in vars1:
+    print(v.title() + ' -> ', aDataRaw[v].unique())
+
+```
+
+A handful of these would be good to cast as a categorical variable with appropriate levels. 
+
+There are also a handful of continuous variables that describe the environment context for the customer's flight. Let's look at a small sample:
+
+```{python}
+
+vars2 = ([
+    'Age', 
+    'Flight Distance', 
+    'Departure Delay in Minutes', 
+    'Arrival Delay in Minutes'
+    ])
+
+for v in vars2:
+        print(v.title() + ' -> ', list(aDataRaw[v].sample(5)), '\n')
+
+```
+
+Finally, we have the customer responses from the satisfaction survey across a myriad of categories. Let's get a sense for each of these:
+
+```{python}
+
+vars3 = (
+    aDataRaw
+    .columns
+    .difference(vars1)
+    .difference(vars2)
+    .difference(['Unnamed: 0', 'id'])
+)
+
+for v in vars3:
+    print(v.title() + ' -> ', list(aDataRaw[v].sample(5)), '\n')
+
+```
+
+From the Kaggle documentation, a score of `1` corresponds to most dissatisfied with the category while `5` is most satisfied. `0` is used for non applicable categories.
+
+We were curious how frequent categories are not applicable in this dataset. We ran some code to assess that frequency:
+
+```{python}
+
+(aDataRaw
+    .loc[:,vars3]
+    .melt(
+        value_vars = vars3, 
+        var_name = 'category', 
+        value_name = 'frequency'
+    )
+    .query('frequency == 0')
+    .groupby('category')
+    .count()
+    .assign(share = lambda dfx: dfx['frequency'] / len(aDataRaw))
+    [['frequency', 'share']]
+    .sort_values('share', ascending = False)
+    .reset_index()
+)
+
+```
+
+For our purposes, we want to explore factors that determine airfare satisfaction. Therefore, we decided to filter out the observations in which such factors presented a zero.
+
+## Cleaning Up the Dataset
+
+Having got a lay of the land for what needs to happen with our dataset, let's set about cleaning it up for easier and more effective use going forward.
+
+We'll first start by setting up some tools to use in our wrangling pipeline, including a column cleanup function and a query string with which we can filter out the aforementioned zeros from the survey questions.
+
+```{python}
+#| echo: false
+
+# Function to cleanup column names
+def cleanCols(df):
+
+    for i in range(len(df.columns.values)):
+        c = df.columns.values[i]
+        c = (
+            c
+            .replace(' ', '_')
+            .replace('/', '_')
+            .replace('-', '')
+            .replace(':', '')
+            .lower()
+        )
+        c = 'seat_class' if c == 'class' else c
+        df.columns.values[i] = c
+
+    return df
+
+# Create a dynamic string query for all survey fields
+q_text = ""
+
+for v in vars3:
+    q_text = q_text + "`" + v + "` > 0"
+    if v != vars3[len(vars3)-1]:
+        q_text = q_text + " or "
+
+```
+
+Next, we'll introduce our cleanup pipeline and take a look at the final result:
+
+```{python}
+
+aDataClean = (
+    aDataRaw
+    # Filter out zeros
+    .query(
+        q_text
+    )
+    # Drop the na's
+    .dropna()
+    # Drop the irrelevant columns
+    .drop(columns = ([
+        'Unnamed: 0', 
+        'id'
+    ]))
+    # Clean the column names
+    .pipe(cleanCols)
+    # Cast fiels as categorical
+    .assign(
+        satisfaction = lambda dfx: (
+            pd.Categorical(
+                values = dfx['satisfaction'], 
+                categories = ['satisfied', 'neutral or dissatisfied'], 
+                ordered = True
+            )
+        ), 
+        customer_type = lambda dfx: (
+            pd.Categorical(
+                values = dfx['customer_type'], 
+                categories = ['Loyal Customer', 'disloyal Customer'], 
+                ordered = True
+            )
+        ), 
+        seat_class = lambda dfx: (
+            pd.Categorical(
+                values = dfx['seat_class'], 
+                categories = ['Business', 'Eco Plus', 'Eco'], 
+                ordered = True
+            )
+        )
+    )
+)
+
+# Cleaned up data frame
+aDataClean.info()
+
+```
+
+We now have a dataset that's been supercharged with record completeness, feature clarity, and appropriate data types. We're ready to begin our exploratory analysis.
+
