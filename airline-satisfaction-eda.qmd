@@ -1,0 +1,36 @@
+---
+title: "Airline Satisfaction"
+subtitle: "Exploratory Data Analysis"
+author: 
+    -   "Adam Bushman"
+    -   "Zachary Manning"
+format: html
+---
+
+Group project for CS 3580 (Data Science Algorithms) of Weber State University.
+
+Chosen dataset: airline customer satisfaction survey results. Data thanks to [TJ Klein and accessed via Kaggle](https://www.kaggle.com/datasets/teejmahal20/airline-passenger-satisfaction).
+
+![Aircraft](https://storage.googleapis.com/kaggle-datasets-images/522275/959195/b0e445e8d51cbbb098917a006378d829/dataset-cover.png?t=2020-02-20-16-56-51)
+
+```{python}
+#| echo: false
+
+import os
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import plotnine as pn
+
+# Load the data (change to your personal directory)
+# os.chdir('')
+aDataRaw = pd.read_csv('airlineSatisfaction.csv')
+
+```
+
+# Introduction
+
+This dataset was chosen because it relates to how well a business is resonating with their customer base. Both Zach and Adam find business problems interesting and challenging.
+
+At first glance it is reasonably complete, sizeable in its number of rows, and poses a wealth of fields to explore. 
+
