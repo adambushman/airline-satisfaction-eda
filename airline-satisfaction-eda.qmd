@@ -162,7 +162,7 @@ q_text = ""
 for v in vars3:
     q_text = q_text + "`" + v + "` > 0"
     if v != vars3[len(vars3)-1]:
-        q_text = q_text + " or "
+        q_text = q_text + " and "
 
 ```
 
@@ -218,3 +218,28 @@ aDataClean.info()
 
 We now have a dataset that's been supercharged with record completeness, feature clarity, and appropriate data types. We're ready to begin our exploratory analysis.
 
+# Analyzing the Dataset
+
+```{python}
+
+(
+    pn.ggplot(
+        (
+            aDataClean
+            .assign(
+                ease_of_online_booking = lambda dfx: (
+                    dfx['ease_of_online_booking'].astype(str)
+                )
+            )
+        ), 
+        pn.aes('ease_of_online_booking', 'age')
+    ) +
+        pn.geom_violin() +
+        pn.labs(
+            title = 'Test title', 
+            y = 'Customer Age', 
+            x = 'Ease of Online Booking'
+        )
+)
+
+```
