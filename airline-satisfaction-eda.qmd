@@ -239,8 +239,31 @@ We now have a dataset that's been supercharged with record completeness, feature
         title = 'Test Title', 
         y = 'Customer Age', 
         x = 'Ease of Online Booking'
+    )
+)
+
+```
+
+```{python}
+
+(
+    pn.ggplot(
+        (
+            aDataClean
+            .assign(
+                ease_of_online_booking = lambda dfx: (
+                    dfx['flight_distance'].astype(str)
+                )
+            )
+        ), 
+        pn.aes('satisfaction', 'flight_distance')
     ) +
-    pn.theme_minimal()
+    pn.geom_violin(fill = '#7d323f') +
+    pn.labs(
+        title = 'Test Title', 
+        y = 'Flight Distance (miles)', 
+        x = ''
+    )
 )
 
 ```
