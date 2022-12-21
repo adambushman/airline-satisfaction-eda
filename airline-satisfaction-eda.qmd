@@ -234,12 +234,13 @@ We now have a dataset that's been supercharged with record completeness, feature
         ), 
         pn.aes('ease_of_online_booking', 'age')
     ) +
-        pn.geom_violin() +
-        pn.labs(
-            title = 'Test title', 
-            y = 'Customer Age', 
-            x = 'Ease of Online Booking'
-        )
+    pn.geom_violin(fill = '#598dcb') +
+    pn.labs(
+        title = 'Test Title', 
+        y = 'Customer Age', 
+        x = 'Ease of Online Booking'
+    ) +
+    pn.theme_minimal()
 )
 
 ```
