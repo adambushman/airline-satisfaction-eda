@@ -267,3 +267,14 @@ We now have a dataset that's been supercharged with record completeness, feature
 )
 
 ```
+
+
+```{python}
+
+range(
+    aDataClean.columns[0].getloc(key='inflight_wifi_service'), 
+    aDataClean.columns.getloc(key='cleanliness')
+)
+
+
+```
